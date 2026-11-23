@@ -11,7 +11,8 @@ const int ENB = 10;
 const int IN3 = 4;
 const int IN4 = 5;
 
-const int motorSpeed = 200;
+const int motorSpeed = 28;
+const int slowSpeed = 15;
 
 void setup() {
   Serial.begin(9600);
@@ -50,26 +51,31 @@ void loop() {
     // Green
     if (g > r * 1.2 && g > b * 1.2) {
       Serial.println("GREEN detected -> Moving Forward");
-      moveForward();
+      moveForward(motorSpeed);
     } 
     // Red
     else if (r > g * 1.3 && r > b * 1.3) {
       Serial.println("RED detected -> Stopping");
       stopMotors();
     }
+    // Yellow
+    else if (r > b * 1.3 && g > b * 1.3 && abs((int)r - (int)g) < max(r, g) * 0.3) {
+      Serial.println("YELLOW detected -> Slowing Down");
+      moveForward(slowSpeed);
+    }
   }
 
-  delay(100);
+  //delay(20);
 }
 
-void moveForward() {
+void moveForward(int speedVal) {
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
-  analogWrite(ENA, motorSpeed);
+  analogWrite(ENA, speedVal);
 
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
-  analogWrite(ENB, motorSpeed);
+  analogWrite(ENB, speedVal+7);
 }
 
 void stopMotors() {
